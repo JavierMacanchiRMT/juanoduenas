@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juano Dueñas — Live Sound & Recording Engineer</title>
+    <meta name="description" content="Juano Dueñas is a freelance live sound and recording engineer working festival stages, studio sessions, and corporate AV.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandOrange: '#C9622A',
+                        darkBg: '#0f0f0f',
+                        cardBg: '#1a1a1a',
+                        cardBorder: '#2a2a2a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Barlow Condensed', 'sans-serif'],
+                        mono: ['IBM Plex Mono', 'monospace'],
+                    },
+                    animation: {
+                        'marquee': 'marquee 30s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #e5e5e5;
+        }
+
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C9622A;
+            border-radius: 4px;
+        }
+
+        /* Endless Marquee Base */
+        .marquee-container {
+            display: flex;
+            width: 200%; /* Double width to accommodate two sets of items */
+        }
+        .marquee-container:hover {
+            animation-play-state: paused;
+        }
+        
+        .logo-item {
+            flex: 0 0 auto;
+            width: 150px;
+            margin: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: grayscale(100%) opacity(0.6);
+            transition: all 0.3s ease;
+        }
+        .logo-item:hover {
+            filter: grayscale(0%) opacity(1);
+        }
+
+        /* 3D Peek Carousel */
+        .carousel-viewport {
+            perspective: 1000px;
+        }
+        .carousel-slide {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease, z-index 0.5s, left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity, left;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-300">
+
+    <header class="fixed top-0 left-0 w-full z-50 bg-darkBg/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#home" class="flex items-center gap-3 group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="36 40 68 60" fill="none" class="w-10 h-10 transition-transform group-hover:scale-105">
+                    <g fill="#C9622A">
+                        <circle cx="42" cy="70" r="2.5"/>
+                        <rect x="50" y="64" width="4" height="12" rx="2"/>
+                        <rect x="59" y="58" width="4" height="24" rx="2"/>
+                        <rect x="68" y="50" width="4" height="40" rx="2"/>
+                        <rect x="66" y="66" width="8" height="8" rx="1.2" transform="rotate(45 70 70)"/>
+                        <rect x="77" y="44" width="4" height="52" rx="2"/>
+                        <rect x="75" y="59.2" width="8" height="8" rx="1.2" transform="rotate(45 79 63.2)"/>
+                        <rect x="86" y="52" width="4" height="36" rx="2"/>
+                        <rect x="84" y="70.8" width="8" height="8" rx="1.2" transform="rotate(45 88 74.8)"/>
+                        <rect x="95" y="60" width="4" height="20" rx="2"/>
+                    </g>
+                </svg>
+                <div class="flex flex-col">
+                    <span class="font-heading font-semibold text-xl tracking-wide text-white leading-tight">Juano Dueñas</span>
+                    <span class="text-[10px] font-mono text-brandOrange tracking-widest uppercase">Live Sound & Recording</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8 font-medium text-sm">
+                <a href="#home" class="hover:text-brandOrange transition-colors">Home</a>
+                <a href="#services" class="hover:text-brandOrange transition-colors">Services</a>
+                <a href="#portfolio" class="hover:text-brandOrange transition-colors">Portfolio</a>
+                <a href="#testimonials" class="hover:text-brandOrange transition-colors">Testimonials</a>
+                <a href="#contact" class="hover:text-brandOrange transition-colors">Contact</a>
+            </nav>
+
+            <!-- Book Now Desktop -->
+            <a href="#contact" class="hidden md:inline-flex items-center justify-center bg-brandOrange text-white px-6 py-2.5 rounded hover:bg-orange-700 transition-colors font-semibold tracking-wide">
+                Book Now
+            </a>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden flex flex-col gap-1.5 p-2 focus:outline-none" aria-label="Toggle menu">
+                <span class="block w-6 h-0.5 bg-white transition-transform duration-300"></span>
+                <span class="block w-6 h-0.5 bg-white transition-opacity duration-300"></span>
+                <span class="block w-6 h-0.5 bg-white transition-transform duration-300"></span>
+            </button>
+        </div>
+
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-20 left-0 w-full bg-darkBg border-b border-white/10 p-6 flex flex-col gap-6 shadow-2xl">
+            <a href="#home" class="mobile-link text-lg font-medium hover:text-brandOrange">Home</a>
+            <a href="#services" class="mobile-link text-lg font-medium hover:text-brandOrange">Services</a>
+            <a href="#portfolio" class="mobile-link text-lg font-medium hover:text-brandOrange">Portfolio</a>
+            <a href="#testimonials" class="mobile-link text-lg font-medium hover:text-brandOrange">Testimonials</a>
+            <a href="#contact" class="mobile-link text-lg font-medium hover:text-brandOrange">Contact</a>
+            <a href="#contact" class="mobile-link text-center bg-brandOrange text-white py-3 rounded hover:bg-orange-700 font-bold tracking-wide mt-4 w-full">
+                Book Now
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-20">
+
+        <!-- HOME SECTION -->
+        <section id="home" class="relative w-full bg-cover bg-center bg-no-repeat py-28 md:py-48" style="background-image: url('assets/photos/hero-foh.jpg');">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#0f0f0f] via-[#0f0f0f]/90 to-[#0f0f0f]/50"></div>
+            
+            <div class="relative z-10 max-w-7xl mx-auto px-6 w-full flex flex-col items-start">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="font-mono text-xs tracking-widest uppercase text-brandOrange">Available for booking</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+                    <span class="font-mono text-xs tracking-widest text-gray-400">Based in Houston, TX — touring worldwide</span>
+                </div>
+                
+                <h1 class="font-heading font-bold text-5xl md:text-7xl lg:text-8xl text-white mb-8 leading-[1.1] tracking-tight">
+                    Sound that holds<br><span class="text-brandOrange">under pressure.</span>
+                </h1>
+                
+                <p class="text-lg md:text-xl max-w-2xl text-gray-300 mb-10 leading-relaxed">
+                    Freelance live sound and recording engineer. I mix front-of-house and monitors for artists on festival stages, run sound for corporate events, and produce, record, and mix in the studio — built to be steady when it counts most.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <a href="#contact" class="bg-brandOrange text-white px-8 py-4 rounded font-semibold text-center hover:bg-orange-700 transition-colors shadow-lg">Book a session</a>
+                    <a href="#services" class="bg-cardBg/80 backdrop-blur-sm border border-cardBorder text-white px-8 py-4 rounded font-semibold text-center hover:border-gray-500 transition-colors">View services</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- BRANDS MARQUEE -->
+        <section class="border-y border-white/10 bg-darkBg py-12 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6 mb-8 text-center">
+                <span class="font-mono text-xs tracking-widest uppercase text-brandOrange mb-2 block">Trusted Gear</span>
+                <h2 class="font-heading font-bold text-3xl text-white">Brands I work with</h2>
+            </div>
+            
+            <div class="w-full overflow-hidden flex relative">
+                <div class="marquee-container animate-marquee">
+                    <!-- Set 1 -->
+                    <div class="flex w-1/2 justify-around items-center">
+                        <img src="assets/logos/shure.png" alt="Shure" class="logo-item">
+                        <img src="assets/logos/sennheiser.png" alt="Sennheiser" class="logo-item">
+                        <img src="assets/logos/digico.png" alt="DiGiCo" class="logo-item">
+                        <img src="assets/logos/yamaha.png" alt="Yamaha" class="logo-item">
+                        <img src="assets/logos/avid.png" alt="Avid" class="logo-item">
+                        <img src="assets/logos/ssl.png" alt="SSL" class="logo-item">
+                        <img src="assets/logos/l-acoustics.png" alt="L-Acoustics" class="logo-item">
+                        <img src="assets/logos/meyer-sound.png" alt="Meyer Sound" class="logo-item">
+                    </div>
+                    <!-- Set 2 -->
+                    <div class="flex w-1/2 justify-around items-center">
+                        <img src="assets/logos/shure.png" alt="Shure" class="logo-item">
+                        <img src="assets/logos/sennheiser.png" alt="Sennheiser" class="logo-item">
+                        <img src="assets/logos/digico.png" alt="DiGiCo" class="logo-item">
+                        <img src="assets/logos/yamaha.png" alt="Yamaha" class="logo-item">
+                        <img src="assets/logos/avid.png" alt="Avid" class="logo-item">
+                        <img src="assets/logos/ssl.png" alt="SSL" class="logo-item">
+                        <img src="assets/logos/l-acoustics.png" alt="L-Acoustics" class="logo-item">
+                        <img src="assets/logos/meyer-sound.png" alt="Meyer Sound" class="logo-item">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES SECTION -->
+        <section id="services" class="max-w-7xl mx-auto px-6 py-24 border-b border-white/10">
+            <div class="mb-16 max-w-2xl">
+                <span class="font-mono text-xs tracking-widest uppercase text-brandOrange mb-2 block">What I do</span>
+                <h2 class="font-heading font-bold text-4xl md:text-5xl text-white mb-6">Three rooms.<br>One standard.</h2>
+                <p class="text-gray-400">Whether it's a festival stage, a boardroom, or a studio session — the job is the same: make it sound right, and make it sound right on time.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-cardBg border border-cardBorder p-8 rounded-xl hover:border-brandOrange/50 transition-colors">
+                    <span class="font-mono text-[10px] bg-darkBg px-2 py-1 rounded text-brandOrange tracking-widest uppercase mb-6 inline-block border border-brandOrange/20">01 / Live Sound</span>
+                    <h3 class="font-heading font-bold text-2xl text-white mb-4">F.O.H. & Monitors</h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">Front-of-house and monitor mixing for artists across festivals, club shows, and tours. Show-ready, every time the lights come up.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> FOH mixing</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> Monitor / IEM mixing</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> System tech / line check</li>
+                    </ul>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="bg-cardBg border border-cardBorder p-8 rounded-xl hover:border-brandOrange/50 transition-colors">
+                    <span class="font-mono text-[10px] bg-darkBg px-2 py-1 rounded text-brandOrange tracking-widest uppercase mb-6 inline-block border border-brandOrange/20">02 / Studio</span>
+                    <h3 class="font-heading font-bold text-2xl text-white mb-4">Production & Mixing</h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">Tracking, editing, mixing, and production for artists who want their recordings to hit as hard as their live show.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> Recording & tracking</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> Studio Mixing</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> Audio post-editing</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-cardBg border border-cardBorder p-8 rounded-xl hover:border-brandOrange/50 transition-colors">
+                    <span class="font-mono text-[10px] bg-darkBg px-2 py-1 rounded text-brandOrange tracking-widest uppercase mb-6 inline-block border border-brandOrange/20">03 / Corporate</span>
+                    <h3 class="font-heading font-bold text-2xl text-white mb-4">Corporate Events Audio</h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">Sound operation for conferences, activations, and corporate events — clean audio for speakers, panels, and presentations.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> AV sound operation</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> Panel mic management</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-brandOrange rounded-full"></span> On-site troubleshooting</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO SECTION -->
+        <section id="portfolio" class="py-24 border-b border-white/10 bg-cardBg/30">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <span class="font-mono text-xs tracking-widest uppercase text-brandOrange mb-2 block">Portfolio</span>
+                    <h2 class="font-heading font-bold text-4xl md:text-5xl text-white">On stage, on record.</h2>
+                </div>
+
+                <!-- Carousel 1: Live Sound -->
+                <div class="mb-24">
+                    <div class="mb-8">
+                        <h3 class="font-heading font-bold text-2xl text-white">Live Sound</h3>
+                        <p class="text-gray-400">Festival stages, club shows, and tour dates — front-of-house and monitor work.</p>
+                    </div>
+                    
+                    <div class="relative w-full h-[450px] md:h-[650px] carousel-viewport flex items-center justify-center overflow-hidden" id="carousel-live">
+                        <!-- Navigation Buttons -->
+                        <button class="prev-btn absolute left-2 md:left-8 z-30 w-12 h-12 rounded-full bg-black/50 border border-white/20 text-white flex items-center justify-center hover:bg-brandOrange hover:border-brandOrange transition-colors backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button class="next-btn absolute right-2 md:right-8 z-30 w-12 h-12 rounded-full bg-black/50 border border-white/20 text-white flex items-center justify-center hover:bg-brandOrange hover:border-brandOrange transition-colors backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+
+                        <!-- Slides -->
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-01-digico-wide.jpg" class="w-full h-full object-cover rounded-xl" alt="DiGiCo Console Wide">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — DiGiCo Console</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-02-starburst.jpg" class="w-full h-full object-cover rounded-xl" alt="Midas Pro6 Starburst">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Midas Pro6</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-03-rain-crowd.jpg" class="w-full h-full object-cover rounded-xl" alt="Yamaha CL5 in Rain">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Yamaha CL5 Outdoor</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-04-profile.jpg" class="w-full h-full object-cover rounded-xl" alt="Mixing Live Profile">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Festival Mix</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-05-digico-red.jpg" class="w-full h-full object-cover rounded-xl" alt="DiGiCo Mixing Red">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Monitors — Festival Stage</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-06.jpg" class="w-full h-full object-cover rounded-xl" alt="Live Mixing Setup">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Club Show</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-07.jpg" class="w-full h-full object-cover rounded-xl" alt="Monitor Mixing">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Monitors — Outdoor Stage</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-08.jpg" class="w-full h-full object-cover rounded-xl" alt="Stage Lights Mixing">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Festival Lights</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-09.jpg" class="w-full h-full object-cover rounded-xl" alt="Daytime Festival Setup">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Line Check</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/live-10-red-stage.jpg" class="w-full h-full object-cover rounded-xl" alt="Night Time Mixing">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">FOH — Main Stage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carousel 2: Studio -->
+                <div class="mb-24">
+                    <div class="mb-8">
+                        <h3 class="font-heading font-bold text-2xl text-white">Studio</h3>
+                        <p class="text-gray-400">Tracking sessions, recording rigs, and post-production mixing.</p>
+                    </div>
+                    
+                    <div class="relative w-full h-[450px] md:h-[650px] carousel-viewport flex items-center justify-center overflow-hidden" id="carousel-studio">
+                        <!-- Navigation Buttons -->
+                        <button class="prev-btn absolute left-2 md:left-8 z-30 w-12 h-12 rounded-full bg-black/50 border border-white/20 text-white flex items-center justify-center hover:bg-brandOrange hover:border-brandOrange transition-colors backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button class="next-btn absolute right-2 md:right-8 z-30 w-12 h-12 rounded-full bg-black/50 border border-white/20 text-white flex items-center justify-center hover:bg-brandOrange hover:border-brandOrange transition-colors backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+
+                        <!-- Slides -->
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/studio-01-desk.jpg" class="w-full h-full object-cover rounded-xl" alt="Studio Desk">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Control Room — Production Desk</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/studio-02-royer.jpg" class="w-full h-full object-cover rounded-xl" alt="Royer Mic Setup">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Tracking — Royer Mic</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/studio-03.jpg" class="w-full h-full object-cover rounded-xl" alt="Telefunken Mic">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Tracking — Telefunken Mic</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/studio-04.jpg" class="w-full h-full object-cover rounded-xl" alt="SSL Mix Desk">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">SSL 360° — Mixing Session</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/studio-05.jpg" class="w-full h-full object-cover rounded-xl" alt="Analog Outboard Gear">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Control Room — Outboard Gear</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carousel 3: Corporate -->
+                <div class="mb-12">
+                    <div class="mb-8">
+                        <h3 class="font-heading font-bold text-2xl text-white">Corporate Events</h3>
+                        <p class="text-gray-400">Clean, uninterrupted audio for conferences, panels, and brand activations.</p>
+                    </div>
+                    
+                    <div class="relative w-full h-[450px] md:h-[650px] carousel-viewport flex items-center justify-center overflow-hidden" id="carousel-corporate">
+                        <!-- Navigation Buttons -->
+                        <button class="prev-btn absolute left-2 md:left-8 z-30 w-12 h-12 rounded-full bg-black/50 border border-white/20 text-white flex items-center justify-center hover:bg-brandOrange hover:border-brandOrange transition-colors backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button class="next-btn absolute right-2 md:right-8 z-30 w-12 h-12 rounded-full bg-black/50 border border-white/20 text-white flex items-center justify-center hover:bg-brandOrange hover:border-brandOrange transition-colors backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+
+                        <!-- Slides -->
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-01-conference-mixer.jpg" class="w-full h-full object-cover rounded-xl" alt="Conference Mixer">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Conference Setup</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-02-conference-mics.jpg" class="w-full h-full object-cover rounded-xl" alt="Conference Mics">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Panel Mics</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-03-yamaha-dm.jpg" class="w-full h-full object-cover rounded-xl" alt="Yamaha DM Setup">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Yamaha DM</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-04-av-setup.jpg" class="w-full h-full object-cover rounded-xl" alt="Corporate Event Setup">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Venue Setup</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-05-av-detail.jpg" class="w-full h-full object-cover rounded-xl" alt="AV Detail">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Detail View</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-06-av-stage.jpg" class="w-full h-full object-cover rounded-xl" alt="AV Stage Tech">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Stage Tech</div>
+                        </div>
+                        <div class="carousel-slide shadow-2xl rounded-xl border-2 border-transparent">
+                            <img src="assets/photos/corp-07-av-show.jpg" class="w-full h-full object-cover rounded-xl" alt="Corporate AV Show">
+                            <div class="absolute bottom-4 left-4 right-4 bg-black/80 px-3 py-1.5 rounded font-mono text-xs text-brandOrange truncate">Corporate AV — Live Event</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS SECTION (Updated Layout) -->
+        <section id="testimonials" class="max-w-7xl mx-auto px-6 py-24 border-b border-white/10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                
+                <!-- Left Column: Title & Controls -->
+                <div class="lg:col-span-4 flex flex-col items-start">
+                    <span class="font-mono text-xs tracking-widest uppercase text-brandOrange mb-2 block">Testimonials</span>
+                    <h2 class="font-heading font-bold text-4xl md:text-5xl text-white mb-4">Clients Reviews</h2>
+                    <p class="text-gray-400 mb-8 leading-relaxed">Real stories from real clients. Here's what people have to say about working with me.</p>
+                    
+                    <!-- Controls -->
+                    <div class="flex gap-4">
+                        <button id="testi-prev" class="w-12 h-12 rounded-full border border-cardBorder flex items-center justify-center text-white hover:border-brandOrange hover:text-brandOrange transition-colors" aria-label="Previous Testimonial">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        </button>
+                        <button id="testi-next" class="w-12 h-12 rounded-full bg-brandOrange text-white flex items-center justify-center hover:bg-orange-700 transition-colors shadow-lg" aria-label="Next Testimonial">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Slider Container -->
+                <div class="lg:col-span-8 relative overflow-hidden w-full h-auto">
+                    <!-- Slider Track -->
+                    <div id="testi-track" class="flex transition-transform duration-500 ease-in-out">
+                        
+                        <!-- Testimonial 1 -->
+                        <div class="w-full flex-shrink-0 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center bg-cardBg border border-cardBorder p-8 rounded-xl">
+                            <div class="flex flex-col justify-center">
+                                <p class="text-lg text-gray-300 italic mb-6 leading-relaxed">"Juano had our monitors dialed in before soundcheck even finished. Calm, fast, and the mix never wavered all set."</p>
+                                <span class="font-heading font-bold text-xl text-white">Alex Mercer</span>
+                                <span class="font-mono text-xs text-brandOrange uppercase tracking-wide mt-1">Artist, Festival Tour</span>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 2 -->
+                        <div class="w-full flex-shrink-0 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center bg-cardBg border border-cardBorder p-8 rounded-xl">
+                            <div class="flex flex-col justify-center">
+                                <p class="text-lg text-gray-300 italic mb-6 leading-relaxed">"We've worked with a lot of FOH engineers. He's one of the few who makes every act on the bill sound like the headliner."</p>
+                                <span class="font-heading font-bold text-xl text-white">Sarah Mitchell</span>
+                                <span class="font-mono text-xs text-brandOrange uppercase tracking-wide mt-1">Festival Production Manager</span>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 3 -->
+                        <div class="w-full flex-shrink-0 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center bg-cardBg border border-cardBorder p-8 rounded-xl">
+                            <div class="flex flex-col justify-center">
+                                <p class="text-lg text-gray-300 italic mb-6 leading-relaxed">"Booked him for our annual conference and the audio didn't drop once across three days of panels. Exactly what you want and never have to think about."</p>
+                                <span class="font-heading font-bold text-xl text-white">David Chen</span>
+                                <span class="font-mono text-xs text-brandOrange uppercase tracking-wide mt-1">Corporate Events Director</span>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 4 -->
+                        <div class="w-full flex-shrink-0 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center bg-cardBg border border-cardBorder p-8 rounded-xl">
+                            <div class="flex flex-col justify-center">
+                                <p class="text-lg text-gray-300 italic mb-6 leading-relaxed">"The mixes he sent back captured exactly what we were going for in the room. Fast turnaround, no notes."</p>
+                                <span class="font-heading font-bold text-xl text-white">Marcus Reyes</span>
+                                <span class="font-mono text-xs text-brandOrange uppercase tracking-wide mt-1">Recording Artist</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="max-w-7xl mx-auto px-6 py-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- Contact Info -->
+                <div>
+                    <span class="font-mono text-xs tracking-widest uppercase text-brandOrange mb-2 block">Direct Contact</span>
+                    <h2 class="font-heading font-bold text-4xl text-white mb-8">Reach me directly</h2>
+                    
+                    <img src="assets/photos/JuanoDuenasProfile.jpg" alt="Juano Dueñas Profile" class="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover mb-8 shadow-xl border border-white/10">
+
+                    <div class="space-y-8">
+                        <div class="flex flex-col">
+                            <span class="font-mono text-[10px] text-gray-500 tracking-widest uppercase mb-1">Email</span>
+                            <a href="mailto:jfernandoduenas@gmail.com" class="text-xl text-white hover:text-brandOrange transition-colors">jfernandoduenas@gmail.com</a>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-mono text-[10px] text-gray-500 tracking-widest uppercase mb-1">Phone / WhatsApp</span>
+                            <a href="tel:+13468620839" class="text-xl text-white hover:text-brandOrange transition-colors">+1 (346) 862-0839</a>
+                            <span class="text-gray-400 text-sm mt-1">WA: +593 99 527 0816</span>
+                        </div>
+                        <div class="flex flex-col border-t border-white/10 pt-8 mt-4">
+                            <span class="font-mono text-[10px] text-gray-500 tracking-widest uppercase mb-1">Based In</span>
+                            <span class="text-lg text-white">Houston, TX — available for travel</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="bg-cardBg border border-cardBorder p-8 rounded-xl">
+                    <span class="font-mono text-xs tracking-widest uppercase text-brandOrange mb-2 block">Send a message</span>
+                    <h2 class="font-heading font-bold text-3xl text-white mb-2">Tell me about the project</h2>
+                    <p class="font-mono text-xs text-gray-400 mb-6 tracking-wide">Typical response time within 24 hours</p>
+                    
+                    <form id="contact-form" class="space-y-4">
+                        <div>
+                            <label class="block font-mono text-xs text-gray-400 mb-1" for="name">Name</label>
+                            <input type="text" id="name" class="w-full bg-darkBg border border-cardBorder rounded px-4 py-3 text-white focus:outline-none focus:border-brandOrange transition-colors" required>
+                        </div>
+                        <div>
+                            <label class="block font-mono text-xs text-gray-400 mb-1" for="email">Email</label>
+                            <input type="email" id="email" class="w-full bg-darkBg border border-cardBorder rounded px-4 py-3 text-white focus:outline-none focus:border-brandOrange transition-colors" required>
+                        </div>
+                        <div>
+                            <label class="block font-mono text-xs text-gray-400 mb-1" for="type">Project Type</label>
+                            <select id="type" class="w-full bg-darkBg border border-cardBorder rounded px-4 py-3 text-white focus:outline-none focus:border-brandOrange transition-colors appearance-none">
+                                <option value="live">Live sound / festival</option>
+                                <option value="studio">Studio recording / mixing</option>
+                                <option value="corporate">Corporate event</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-mono text-xs text-gray-400 mb-1" for="message">Message</label>
+                            <textarea id="message" rows="4" class="w-full bg-darkBg border border-cardBorder rounded px-4 py-3 text-white focus:outline-none focus:border-brandOrange transition-colors resize-none" placeholder="Venue, scope, dates..." required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-brandOrange text-white font-bold py-4 rounded hover:bg-orange-700 transition-colors tracking-wide mt-2">
+                            Send message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-white/10 bg-darkBg py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 font-mono">
+            <span>&copy; <span id="year"></span> Juano Dueñas. All rights reserved.</span>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-brandOrange transition-colors">Instagram</a>
+                <a href="#" class="hover:text-brandOrange transition-colors">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const lines = btn.querySelectorAll('span');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) {
+                // Cross icon
+                lines[0].classList.add('rotate-45', 'translate-y-2');
+                lines[1].classList.add('opacity-0');
+                lines[2].classList.add('-rotate-45', '-translate-y-2');
+            } else {
+                // Hamburger icon
+                lines[0].classList.remove('rotate-45', 'translate-y-2');
+                lines[1].classList.remove('opacity-0');
+                lines[2].classList.remove('-rotate-45', '-translate-y-2');
+            }
+        }
+
+        btn.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', () => {
+            if (!menu.classList.contains('hidden')) toggleMenu();
+        }));
+
+        // 3D Peek Carousel Logic (Vertical Version)
+        function initPeekCarousel(carouselId) {
+            const container = document.getElementById(carouselId);
+            if (!container) return;
+
+            const slides = Array.from(container.querySelectorAll('.carousel-slide'));
+            const nextBtn = container.querySelector('.next-btn');
+            const prevBtn = container.querySelector('.prev-btn');
+            
+            if (slides.length === 0) return;
+            
+            let currentIndex = 0;
+
+            function updateCarousel() {
+                slides.forEach((slide, index) => {
+                    slide.className = 'carousel-slide absolute top-1/2 -translate-y-1/2 h-[85%] aspect-[3/4] md:aspect-[2/3] rounded-xl shadow-2xl border-2 transition-all duration-500 ease-out cursor-pointer overflow-hidden flex-shrink-0';
+                    
+                    if (index === currentIndex) {
+                        slide.classList.add('left-1/2', '-translate-x-1/2', 'scale-100', 'opacity-100', 'z-20', 'border-brandOrange/50');
+                        slide.classList.remove('border-transparent');
+                        slide.onclick = null; 
+                    } 
+                    else if (index === (currentIndex - 1 + slides.length) % slides.length) {
+                        slide.classList.add('left-[15%]', 'md:left-[25%]', '-translate-x-1/2', 'scale-[0.85]', 'opacity-40', 'z-10', 'border-transparent', 'hover:opacity-70');
+                        slide.onclick = () => { currentIndex = index; updateCarousel(); };
+                    } 
+                    else if (index === (currentIndex + 1) % slides.length) {
+                        slide.classList.add('left-[85%]', 'md:left-[75%]', '-translate-x-1/2', 'scale-[0.85]', 'opacity-40', 'z-10', 'border-transparent', 'hover:opacity-70');
+                        slide.onclick = () => { currentIndex = index; updateCarousel(); };
+                    } 
+                    else {
+                        slide.classList.add('left-1/2', '-translate-x-1/2', 'scale-50', 'opacity-0', 'z-0', 'pointer-events-none', 'border-transparent');
+                    }
+                });
+            }
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % slides.length;
+                updateCarousel();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                updateCarousel();
+            });
+
+            updateCarousel();
+        }
+
+        // Testimonial Slider Logic
+        function initTestimonialSlider() {
+            const track = document.getElementById('testi-track');
+            const prevBtn = document.getElementById('testi-prev');
+            const nextBtn = document.getElementById('testi-next');
+            if (!track || !prevBtn || !nextBtn) return;
+
+            const totalTestimonials = track.children.length;
+            let currentIndex = 0;
+
+            function updateSlider() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalTestimonials - 1;
+                updateSlider();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex < totalTestimonials - 1) ? currentIndex + 1 : 0;
+                updateSlider();
+            });
+        }
+
+        // Initialize Components
+        document.addEventListener('DOMContentLoaded', () => {
+            initPeekCarousel('carousel-live');
+            initPeekCarousel('carousel-studio');
+            initPeekCarousel('carousel-corporate');
+            initTestimonialSlider();
+        });
+
+        // Initialize Supabase Client
+const supabaseUrl = 'https://oviobcpgbmvwlrqtgmci.supabase.co';
+const supabaseAnonKey = 'sb_publishable_F-cMIJ_OdGTQQzSXBcrukw_FcincJA-';
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+// Handle Form Submission
+document.getElementById('contact-form').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Prevent page reload
+
+    // Change button text to show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    // Gather input values
+    const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        type: document.getElementById('type').value,
+        message: document.getElementById('message').value
+    };
+
+    // Send data to Supabase
+    const { error } = await supabaseClient
+        .from('contact_submissions')
+        .insert([formData]);
+
+    // Handle response
+    if (error) {
+        console.error('Supabase Error:', error);
+        alert('There was a problem sending your message. Please try again.');
+    } else {
+        alert('Message sent successfully!');
+        event.target.reset(); // Clear form fields
+    }
+
+    // Restore button state
+    submitBtn.textContent = originalBtnText;
+    submitBtn.disabled = false;
+});
+    </script>
+</body>
+</html>
